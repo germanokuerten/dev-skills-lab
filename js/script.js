@@ -1,82 +1,60 @@
-// Extra attempts
+/**
+ * Retrieve the list of todos from localStorage
+ * @returns An array of todos
+ */
+const getTodos = () => JSON.parse(window.localStorage.getItem("todos")) || []
 
-// const $textInput = $("[type='text']")        // [] are only for attributes.
-// const $submit = $("[type='submit']")
-// const $ul = $("#todo-display")
+/**
+ * Updates the list of todos in localStorage
+ * @param {*} todos An JSON array of todos 
+ */
+const setTodos = todos => window.localStorage.setItem("todos", JSON.stringify(todos))
 
-// const todos = JSON.parse(localStorage.getItem("todos")) || [];
+/**
+ * Removes a todo from the list, updating the localstorage
+ * @param {*} $target The target li element 
+ */
+const removeTodo = $target => {
+    const index = $target.index()
+    const todos = getTodos()
+    setTodos(todos.filter((todo, i) => i !== index))
+    $target.remove()
+}
 
-// const addTodoNode = newTodo => {
-//   const $li = $("<li>")
-//   $li.text(newTodo)
-//   $ul.append($li)
-//   const remove = (event) => {
-//       const $target = $(event.target)
-//       $target.remove()
-//   }
-//   $li.on("click", remove)
-// }
+/**
+ * Sync the todos data with the screen, rendering li elements for each todo
+ */
+const renderTodos = () => {
+    const $ul = $("#todo-display")
+    $ul.empty()
+    getTodos()
+        .map(todo => {
+            const $li = $("<li>")
+            $li.text(todo)
+            $li.on("click", event => removeTodo($(event.target)))
+            return $li
+        })
+        .forEach($li => $ul.append($li))
+}
 
-
-// $submit.on("click", (event) => {  
-//     event.preventDefault()
-//     const newTodo = $textInput.val()                   
-//     todos.push(newTodo)
-//     addTodoNode(newTodo)
-//     $textInput.val("")
-
-    
-//     window.localStorage.todos = todos
-//     // for (let i = 0; i < todos.length; i++) {
-//     //     console.log(todos[i]); 
-//     //   }
-      
-//     localStorage.setItem("todos", JSON.stringify(todos))
-//     let newItems = localStorage.getItem('todos');
-    
-//     console.log(window.localStorage.todos)
-// })
-
-
-
-
-
-// DOM Menu Lab
+/**
+ * Push a todo to the list, updating the localstorage
+ * @param {*} data 
+ */
+const pushTodo = data => {
+    const todos = getTodos()
+    todos.push(data)
+    setTodos(todos)
+}
 
 const $textInput = $("[type='text']")        // [] are only for attributes.
 const $submit = $("[type='submit']")
-const $ul = $("#todo-display")
-
-const todos = []
-
-// write 4 loop to loop through todos (local storage list)
-
-
-// creates a new li and appends it to the DOM
-
-
 $submit.on("click", (event) => {  
     event.preventDefault()                   
-    const newTodo = $textInput.val() 
-    todos.push(newTodo)
-    const $li = $("<li>")
-    $li.text(newTodo)
-    $ul.append($li)
-    const remove = (event) => {
-        const $target = $(event.target)
-        $target.remove()
-    }
-    $li.on("click", remove)
+    pushTodo($textInput.val())
     $textInput.val("")
-
-    
-    window.localStorage.todos = todos
-    // for (let i = 0; i < todos.length; i++) {
-    //     console.log(todos[i]); 
-    //   }
-      
-    localStorage.setItem("todos", JSON.stringify(todos))
-    let newItems = localStorage.getItem('todos');
-    
-    console.log(window.localStorage.todos)
+    renderTodos()
 })
+
+// Initial render
+renderTodos()
